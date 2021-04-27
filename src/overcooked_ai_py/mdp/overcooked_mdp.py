@@ -899,8 +899,7 @@ POTENTIAL_CONSTANTS = {
 DEFAULT_SPARSE_REWARD_OPTS = {
     'deliver_soup': 20,
     'add_onion_to_pot': 0,
-    'pickup_onion': 0,
-    'add_soup_to_plate': 0
+    'pickup_onion': 0
 }
 
 class OvercookedGridworld(object):
@@ -1277,7 +1276,6 @@ class OvercookedGridworld(object):
                     obj = new_state.remove_object(i_pos) # Get soup
                     player.set_object(obj)
                     shaped_reward[player_idx] += self.reward_shaping_params["SOUP_PICKUP_REWARD"]
-                    sparse_reward[player_idx] += self.sparse_reward_opts["add_soup_to_plate"]
 
                 elif player.get_object().name in Recipe.ALL_INGREDIENTS:
                     # Adding ingredient to soup

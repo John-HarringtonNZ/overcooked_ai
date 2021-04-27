@@ -482,6 +482,7 @@ class SoupState(ObjectState):
         if len(self.ingredients) == 0:
             raise ValueError("Must add at least one ingredient to soup before you can begin cooking")
         self._cooking_tick = 0
+        #self._cooking_tick = self.cook_time #another way to have begin_cooking also finish cooking
 
     def cook(self):
         if self.is_idle:
@@ -1106,7 +1107,7 @@ class OvercookedGridworld(object):
                     m = int(np.random.randint(low=0, high=4-n))
                     q = np.random.rand()
                     cooking_tick = 0 if q < rnd_obj_prob_thresh else -1
-                    start_state.objects[pot_loc] = SoupState.get_soup(pot_loc, num_onions=n, num_tomatoes=m, cooking_tick=cooking_tick)
+                    start_state.objects[pot_loc] = SoupState.get_soup(pot_loc, num_onions=n, num_tomatoes=m, cooking_tick=cooking_tick, cook_time=0)
 
             # For each player, add a random object with prob rnd_obj_prob_thresh
             for player in start_state.players:
@@ -1118,7 +1119,7 @@ class OvercookedGridworld(object):
                     m = int(np.random.randint(low=0, high=4-n))
                     if obj == "soup":
                         player.set_object(
-                            SoupState.get_soup(player.position, num_onions=n, num_tomatoes=m, finished=True)
+                            SoupState.get_soup(player.position, num_onions=n, num_tomatoes=m, finished=True, cook_time=0)
                         )
                     else:
                         player.set_object(ObjectState(obj, player.position))
@@ -1281,7 +1282,7 @@ class OvercookedGridworld(object):
 
                     if not new_state.has_object(i_pos):
                         # Pot was empty, add soup to it
-                        new_state.add_object(SoupState(i_pos, ingredients=[]))
+                        new_state.add_object(SoupState(i_pos, ingredients=[], cook_time=0))
 
                     # Add ingredient if possible
                     soup = new_state.get_object(i_pos)
@@ -1732,10 +1733,10 @@ class OvercookedGridworld(object):
             "useless" : self.is_potting_useless
         }
 
-        for outcome, outcome_fn in POTTING_FNS.items():
-            if outcome_fn(state, old_soup, new_soup):
-                potting_key = "{}_{}_potting".format(outcome, obj_name)
-                events_infos[potting_key][player_index] = True
+        #for outcome, outcome_fn in POTTING_FNS.items():
+        #    if outcome_fn(state, old_soup, new_soup):
+        #        potting_key = "{}_{}_potting".format(outcome, obj_name)
+        #        events_infos[potting_key][player_index] = True
 
     
     def log_object_pickup(self, events_infos, state, obj_name, pot_states, player_index):
@@ -1750,10 +1751,10 @@ class OvercookedGridworld(object):
             "onion": self.is_ingredient_pickup_useful,
             "dish": self.is_dish_pickup_useful
         }
-        if obj_name in USEFUL_PICKUP_FNS:
-            if USEFUL_PICKUP_FNS[obj_name](state, pot_states, player_index):
-                obj_useful_key = "useful_" + obj_name + "_pickup"
-                events_infos[obj_useful_key][player_index] = True
+        #if obj_name in USEFUL_PICKUP_FNS:
+        #    if USEFUL_PICKUP_FNS[obj_name](state, pot_states, player_index):
+        #        obj_useful_key = "useful_" + obj_name + "_pickup"
+        #        events_infos[obj_useful_key][player_index] = True
 
     def log_object_drop(self, events_infos, state, obj_name, pot_states, player_index):
         """Player dropped the object on a counter"""
@@ -1767,10 +1768,10 @@ class OvercookedGridworld(object):
             "onion": self.is_ingredient_drop_useful,
             "dish": self.is_dish_drop_useful
         }
-        if obj_name in USEFUL_DROP_FNS:
-            if USEFUL_DROP_FNS[obj_name](state, pot_states, player_index):
-                obj_useful_key = "useful_" + obj_name + "_drop"
-                events_infos[obj_useful_key][player_index] = True
+        #if obj_name in USEFUL_DROP_FNS:
+        #    if USEFUL_DROP_FNS[obj_name](state, pot_states, player_index):
+        #        obj_useful_key = "useful_" + obj_name + "_drop"
+        #        events_infos[obj_useful_key][player_index] = True
 
     def is_dish_pickup_useful(self, state, pot_states, player_index=None):
         """
@@ -1966,7 +1967,6 @@ class OvercookedGridworld(object):
                         state_obj = state.get_object((x, y))
                         if state_obj.name[0] == "s":
                             grid_string_add += str(len(str(state_obj)))
-                            print(grid_string_add)
                         else:
                             grid_string_add += state_obj.name[:1]
                     elif element == "P":

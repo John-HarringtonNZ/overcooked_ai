@@ -5,7 +5,7 @@ from overcooked_ai_py.utils import mean_and_std_err, append_dictionaries
 from overcooked_ai_py.mdp.actions import Action
 from overcooked_ai_py.mdp.overcooked_mdp import OvercookedGridworld, EVENT_TYPES
 from overcooked_ai_py.planning.planners import MediumLevelActionManager, MotionPlanner, NO_COUNTERS_PARAMS
-from overcooked_ai_py.visualization.state_visualizer import StateVisualizer
+from overcooked_ai_py.visualization.state_visualizer import StateVisualizer, image_to_array
 from overcooked_ai_py.visualization.pygame_utils import run_dynamic_window
 
 DEFAULT_ENV_PARAMS = {
@@ -640,8 +640,14 @@ class Overcooked(gym.Env):
                     "other_agent_env_idx": 1 - self.agent_idx}
 
     def render(self, mode="human", close=False):
-        import pygame
         grid = self.base_env.mdp.terrain_mtx
         state = self.base_env.state
         surface = self.visualizer.render_state(state, grid, action_probs=None)
         self.window = run_dynamic_window(self.window, surface)
+        return image_to_array(surface)
+
+    def return_state_img(self):
+        grid = self.base_env.mdp.terrain_mtx
+        state = self.base_env.state
+        surface = self.visualizer.render_state(state, grid, action_probs=None)
+        return image_to_array(surface)

@@ -9,6 +9,8 @@ from overcooked_ai_py.mdp.actions import Direction, Action
 
 roboto_path = os.path.join(FONTS_DIR, "Roboto-Regular.ttf")
 
+def image_to_array(surface):
+    return pygame.surfarray.pixels3d(surface)
 
 class StateVisualizer:
     TERRAINS_IMG = MultiFramePygameImage(os.path.join(GRAPHICS_DIR, 'terrain.png'), os.path.join(GRAPHICS_DIR, 'terrain.json'))
